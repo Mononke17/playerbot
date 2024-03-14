@@ -8,13 +8,13 @@ function loadPlayerNames(fileInputPath: string): string[] {
     let playernames: string[] | null = data.match(
       /(.+)(?=\n<https:\/\/lolpros\.gg\/player\/)/g,
     );
-    if (playernames != null) {
-      return playernames;
-    } else {
-      console.log(
-        "no players found in input file, did you input the right file?",
-      );
-    }
+      if (playernames != null) {
+        return playernames;
+      } else {
+        console.log(
+          "no players found in input file, did you input the right file?",
+        );
+      }
   } catch (err) {
     console.error(err);
   }
@@ -45,37 +45,22 @@ function loadPlayerTeams(fileInputPath: string): string[] {
       /((?<=\d \t).*(?= |\n<))|(?<=\d \t)-/g,
     );
 
-    if (playerTeams != null) {
-      for (let i = 0; i < playerTeams.length; i++) {
-        if (playerTeams[i] === "-") {
-          playerTeams[i] = "";
+      if (playerTeams != null) {
+        for (let i = 0; i < playerTeams.length; i++) {
+          if (playerTeams[i] === "-") {
+            playerTeams[i] = "";
+          }
         }
+        return playerTeams;
+      } else {
+        console.log(
+          "no playerTeams found in input file, did you input the right file?",
+        );
       }
-      return playerTeams;
-    } else {
-      console.log(
-        "no playerTeams found in input file, did you input the right file?",
-      );
-    }
   } catch (err) {
     console.error(err);
   }
   return [];
-}
-async function loadPlayerPUUIDs(playerRiotIDs: string[]) {
-  let playerPUUIDs: string[] = [];
-  for (let i = 0; i < playerRiotIDs.length; i++) {
-    let url =
-      "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" +
-      playerRiotIDs[i].slice(0, playerRiotIDs[i].indexOf("#")) +
-      "/" +
-      playerRiotIDs[i].slice(playerRiotIDs[i].indexOf("#") + 1) +
-      "?api_key=" +
-      apikey;
-    let PUUID = await geturlJson(url);
-    playerPUUIDs.push(PUUID.puuid);
-  }
-  return playerPUUIDs;
 }
 async function geturlJson(url: string) {
   const response = await fetch(url);
@@ -104,19 +89,29 @@ function getPlayerAccs(content: string): string[] {
   return [];
 }
 async function getPUUIDs(playerRiotIDs: string[], i: number) {
-    let url =
-      "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" +
-      playerRiotIDs[i].slice(0, playerRiotIDs[i].indexOf("#")) +
-      "/" +
-      playerRiotIDs[i].slice(playerRiotIDs[i].indexOf("#") + 1) +
-      "?api_key=" +
-      apikey;
+  let url =
+    "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" +
+    playerRiotIDs[i].slice(0, playerRiotIDs[i].indexOf("#")) +
+    "/" +
+    playerRiotIDs[i].slice(playerRiotIDs[i].indexOf("#") + 1) +
+    "?api_key=" +
+    apikey;
   let response = await geturl(url);
   let jsonresponse = await response.json();
-  
+
 
   if (await response.status != 200) {
-    console.log( i + " riot api response code: " + response.status);
+    if (response.status != 429) {
+      console.log(playerRiotIDs[i]);
+      console.log(url);
+      console.log("riot api response code: " + response.status);
+      if (response.status = 404) {
+        if (playerRiotIDs[i + 1]) {
+          return [""].concat(await getPUUIDs(playerRiotIDs, i + 1))	 
+        }
+        return "";
+      }
+    }
     return await getPUUIDs(playerRiotIDs, i);
   }
   if (playerRiotIDs[i+1]) {
@@ -129,22 +124,22 @@ async function updateDB(loadfile: string) {
   const playerNames: string[] = loadPlayerNames(loadfile);
   const playerurls: string[] = loadPlayerLinks(loadfile);
   const playerTeams: string[] = loadPlayerTeams(loadfile);
- // let playersRIOTIDs: string[][] = [];
+  // let playersRIOTIDs: string[][] = [];
   let playerPUUIDs: string[][] = [];
   for (let i = 0; i <= playerurls.length; i++) {
     await geturlText(playerurls[i])
-      .then(async function (playerurl) {
-        console.log(
-          "DBUPDATE getRIOTIDS Progress: " +
-            (i + 1) +
-            " / " +
-            playerNames.length,
-        );
-        playerPUUIDs.push(await getPUUIDs(getPlayerAccs(playerurl), 0));
-      })
-      .catch(function (response) {
-        console.log(response);
-      });
+    .then(async function (playerurl) {
+      console.log(
+        "DBUPDATE getRIOTIDS Progress: " +
+          (i + 1) +
+          " / " +
+          playerNames.length,
+      );
+      playerPUUIDs.push(await getPUUIDs(getPlayerAccs(playerurl), 0));
+    })
+    .catch(function (response) {
+      console.log(response);
+    });
   }
   console.log("writing to file...");
   let dbstring = "\n";
