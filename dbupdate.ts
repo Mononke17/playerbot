@@ -8,13 +8,13 @@ function loadPlayerNames(fileInputPath: string): string[] {
     let playernames: string[] | null = data.match(
       /(.+)(?=\n<https:\/\/lolpros\.gg\/player\/)/g,
     );
-      if (playernames != null) {
-        return playernames;
-      } else {
-        console.log(
-          "no players found in input file, did you input the right file?",
-        );
-      }
+    if (playernames != null) {
+      return playernames;
+    } else {
+      console.log(
+        "no players found in input file, did you input the right file?",
+      );
+    }
   } catch (err) {
     console.error(err);
   }
@@ -45,18 +45,18 @@ function loadPlayerTeams(fileInputPath: string): string[] {
       /((?<=\d \t).*(?= |\n<))|(?<=\d \t)-/g,
     );
 
-      if (playerTeams != null) {
-        for (let i = 0; i < playerTeams.length; i++) {
-          if (playerTeams[i] === "-") {
-            playerTeams[i] = "";
-          }
+    if (playerTeams != null) {
+      for (let i = 0; i < playerTeams.length; i++) {
+        if (playerTeams[i] === "-") {
+          playerTeams[i] = "";
         }
-        return playerTeams;
-      } else {
-        console.log(
-          "no playerTeams found in input file, did you input the right file?",
-        );
       }
+      return playerTeams;
+    } else {
+      console.log(
+        "no playerTeams found in input file, did you input the right file?",
+      );
+    }
   } catch (err) {
     console.error(err);
   }
@@ -72,7 +72,7 @@ async function geturlText(url: string) {
 }
 async function geturl(url: string) {
   const response = await fetch(url);
-  return response; 
+  return response;
 }
 //this function takes the html body and returns the riot IDs
 function getPlayerAccs(content: string): string[] {
@@ -99,23 +99,22 @@ async function getPUUIDs(playerRiotIDs: string[], i: number) {
   let response = await geturl(url);
   let jsonresponse = await response.json();
 
-
-  if (await response.status != 200) {
+  if ((await response.status) != 200) {
     if (response.status != 429) {
       console.log(playerRiotIDs[i]);
       console.log(url);
       console.log("riot api response code: " + response.status);
-      if (response.status = 404) {
+      if ((response.status = 404)) {
         if (playerRiotIDs[i + 1]) {
-          return [""].concat(await getPUUIDs(playerRiotIDs, i + 1))	 
+          return [""].concat(await getPUUIDs(playerRiotIDs, i + 1));
         }
-        return "";
+        return [""];
       }
     }
     return await getPUUIDs(playerRiotIDs, i);
   }
-  if (playerRiotIDs[i+1]) {
-    return [jsonresponse.puuid].concat(await getPUUIDs(playerRiotIDs, i + 1))
+  if (playerRiotIDs[i + 1]) {
+    return [jsonresponse.puuid].concat(await getPUUIDs(playerRiotIDs, i + 1));
   }
   return [jsonresponse.puuid];
 }
@@ -128,18 +127,18 @@ async function updateDB(loadfile: string) {
   let playerPUUIDs: string[][] = [];
   for (let i = 0; i <= playerurls.length; i++) {
     await geturlText(playerurls[i])
-    .then(async function (playerurl) {
-      console.log(
-        "DBUPDATE getRIOTIDS Progress: " +
-          (i + 1) +
-          " / " +
-          playerNames.length,
-      );
-      playerPUUIDs.push(await getPUUIDs(getPlayerAccs(playerurl), 0));
-    })
-    .catch(function (response) {
-      console.log(response);
-    });
+      .then(async function (playerurl) {
+        console.log(
+          "DBUPDATE getRIOTIDS Progress: " +
+            (i + 1) +
+            " / " +
+            playerNames.length,
+        );
+        playerPUUIDs.push(await getPUUIDs(getPlayerAccs(playerurl), 0));
+      })
+      .catch(function (response) {
+        console.log(response);
+      });
   }
   console.log("writing to file...");
   let dbstring = "\n";
