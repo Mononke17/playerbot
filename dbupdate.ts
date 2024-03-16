@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 const fs = require("fs");
 import * as cheerio from "cheerio";
-const apikey: string = "";
+const apikey: string = "RGAPI-6cf8541c-c232-4b31-bf06-42eb52a3cdba";
 function loadPlayerNames(fileInputPath: string): string[] {
   try {
     const data = fs.readFileSync(fileInputPath, "utf8");
@@ -106,6 +106,7 @@ async function getPUUIDs(playerRiotIDs: string[], i: number) {
         i++;
       } else {
         puuids.push(jsonresponse.puuid);
+	i++;
       }
     }
   }
