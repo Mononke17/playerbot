@@ -1,7 +1,14 @@
 import fetch from "node-fetch";
-const fs = require("fs");
 import * as cheerio from "cheerio";
-const apikey: string = "";
+const fs = require("fs");
+let apikey: string = "";
+let errors: string = "";
+try {
+  const data = fs.readFileSync("apikey", "utf8");
+  apikey = data;
+} catch (err) {
+  console.log(err);
+}
 function loadPlayerNames(fileInputPath: string): string[] {
   try {
     const data = fs.readFileSync(fileInputPath, "utf8");
@@ -84,8 +91,9 @@ function getPlayerAccs(content: string): string[] {
   if (playeraccs != null) return playeraccs;
   return [];
 }
-async function getPUUIDs(playerRiotIDs: string[], i: number) {
+async function getPUUIDs(playerRiotIDs: string[]): Promise<string[]> {
   let puuids: string[] = [];
+  let i = 0;
   while (i < playerRiotIDs.length) {
     let url =
       "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" +
@@ -99,6 +107,7 @@ async function getPUUIDs(playerRiotIDs: string[], i: number) {
 
     if (response.status != 429) {
       if (response.status != 200) {
+        errors += response.status + " " + playerRiotIDs[i] + "\n" + url + "\n";
         console.log(playerRiotIDs[i]);
         console.log(url);
         console.log("riot api response code: " + response.status);
@@ -106,7 +115,7 @@ async function getPUUIDs(playerRiotIDs: string[], i: number) {
         i++;
       } else {
         puuids.push(jsonresponse.puuid);
-	i++;
+        i++;
       }
     }
   }
@@ -128,7 +137,7 @@ async function updateDB(loadfile: string) {
             " / " +
             playerNames.length,
         );
-        playerPUUIDs.push(await getPUUIDs(getPlayerAccs(playerurl), 0));
+        playerPUUIDs.push(await getPUUIDs(getPlayerAccs(playerurl)));
       })
       .catch(function (response) {
         console.log(response);
@@ -145,6 +154,13 @@ async function updateDB(loadfile: string) {
       console.error(err);
     } else {
       console.log("DB updated!");
+    }
+  });
+  fs.writeFile("errors.txt", errors, (err: Error) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log("errors written, check for debug");
     }
   });
 }
