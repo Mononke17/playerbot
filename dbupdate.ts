@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 const fs = require("fs");
 import * as cheerio from "cheerio";
-const apikey: string = "RGAPI-9fb2fd63-d7fc-4b81-a80b-6dc6f358b298";
+const apikey: string = "";
 function loadPlayerNames(fileInputPath: string): string[] {
   try {
     const data = fs.readFileSync(fileInputPath, "utf8");
@@ -62,10 +62,6 @@ function loadPlayerTeams(fileInputPath: string): string[] {
   }
   return [];
 }
-async function geturlJson(url: string) {
-  const response = await fetch(url);
-  return await response.json();
-}
 async function geturlText(url: string) {
   const response = await fetch(url);
   return await response.text();
@@ -89,34 +85,31 @@ function getPlayerAccs(content: string): string[] {
   return [];
 }
 async function getPUUIDs(playerRiotIDs: string[], i: number) {
-  let url =
-    "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" +
-    playerRiotIDs[i].slice(0, playerRiotIDs[i].indexOf("#")) +
-    "/" +
-    playerRiotIDs[i].slice(playerRiotIDs[i].indexOf("#") + 1) +
-    "?api_key=" +
-    apikey;
-  let response = await geturl(url);
-  let jsonresponse = await response.json();
+  let puuids: string[] = [];
+  while (i < playerRiotIDs.length) {
+    let url =
+      "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" +
+      playerRiotIDs[i].slice(0, playerRiotIDs[i].indexOf("#")) +
+      "/" +
+      playerRiotIDs[i].slice(playerRiotIDs[i].indexOf("#") + 1) +
+      "?api_key=" +
+      apikey;
+    let response = await geturl(url);
+    let jsonresponse = await response.json();
 
-  if ((await response.status) != 200) {
     if (response.status != 429) {
-      console.log(playerRiotIDs[i]);
-      console.log(url);
-      console.log("riot api response code: " + response.status);
-      if ((response.status = 404)) {
-        if (playerRiotIDs[i + 1]) {
-          return [""].concat(await getPUUIDs(playerRiotIDs, i + 1));
-        }
-        return [""];
+      if (response.status != 200) {
+        console.log(playerRiotIDs[i]);
+        console.log(url);
+        console.log("riot api response code: " + response.status);
+        puuids.push("");
+        i++;
+      } else {
+        puuids.push(jsonresponse.puuid);
       }
     }
-    return await getPUUIDs(playerRiotIDs, i);
   }
-  if (playerRiotIDs[i + 1]) {
-    return [jsonresponse.puuid].concat(await getPUUIDs(playerRiotIDs, i + 1));
-  }
-  return [jsonresponse.puuid];
+  return puuids;
 }
 
 async function updateDB(loadfile: string) {
@@ -141,7 +134,7 @@ async function updateDB(loadfile: string) {
       });
   }
   console.log("writing to file...");
-  let dbstring = "\n";
+  let dbstring = "";
   for (let i = 0; i < playerNames.length; i++) {
     dbstring +=
       playerTeams[i] + "." + playerNames[i] + ":" + playerPUUIDs[i] + "\n";
