@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 const fs = require("fs");
 import * as cheerio from "cheerio";
-const apikey: string = "RGAPI-6cf8541c-c232-4b31-bf06-42eb52a3cdba";
+const apikey: string = "";
 function loadPlayerNames(fileInputPath: string): string[] {
   try {
     const data = fs.readFileSync(fileInputPath, "utf8");
