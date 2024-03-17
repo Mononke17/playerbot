@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 const fs = require("fs");
 let apikey: string = "RGAPI-26f325f9-1667-4189-be55-c05b4ab75a4d";
 let errors: string = "";
+let log: string = "";
 //try {
 //  const data = fs.readFileSync("apikey", "utf8");
 //  apikey = data;
@@ -114,6 +115,8 @@ async function getPUUIDs(playerRiotIDs: string[]): Promise<string[]> {
         puuids.push("");
         i++;
       } else {
+	log += jsonresponse.puuid + "," + playerRiotIDs[i] + "\n"
+	console.log(jsonresponse.puuid);      
         puuids.push(jsonresponse.puuid);
         i++;
       }
@@ -157,6 +160,13 @@ async function updateDB(loadfile: string) {
     }
   });
   fs.writeFile("errors.txt", errors, (err: Error) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log("errors written, check for debug");
+    }
+  });
+  fs.writeFile("log.txt", log, (err: Error) => {
     if (err) {
       console.error(err);
     } else {
