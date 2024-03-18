@@ -12,7 +12,7 @@ Playerbot does not come with a ready-to-use database for looking up playeraccoun
 5. Now generate a database. (You can skip the steps 6-8 if you already have one)
 6. Go to [lolpros.gg/ladders](https://lolpros.gg/ladders). and scroll all the way to the bottom.
 7. then save the website as a textfile in the playerbot directory, using your webbrowsers' menu or the common shortcut "control + s".
-8. run ```node index.js S filename``` and replace filename wth the path to the just-saved file. (this may take a several hours).
-9. run the server using ```node index.js```.
+8. Run ```node index.js S filename``` and replace filename wth the path to the just-saved file. (this may take a several hours).
+9. Run the server using ```node index.js```.
 10. send a request to localhost:{configured port}/players and receive information.
   
