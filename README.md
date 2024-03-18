@@ -1,7 +1,7 @@
 # playerbot
 A Nodejs-Server that provides Info about the players in a lolpro-players game.
 
-Playerbot does not come with a ready-to-use database for looking up playeraccounts, so you need to make one after installation.
+Playerbot does not come with an up-to-date database for looking up playeraccounts, so you need to make one after installation.
 
 
 ## Usage
