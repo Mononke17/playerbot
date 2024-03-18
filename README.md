@@ -14,5 +14,5 @@ Playerbot does not come with a ready-to-use database for looking up playeraccoun
 7. then save the website as a textfile in the playerbot directory, using your webbrowsers' menu or the common shortcut "control + s".
 8. Run ```node index.js S filename``` and replace filename wth the path to the just-saved file. (this may take a several hours).
 9. Run the server using ```node index.js```.
-10. Send a request to localhost:{configured port}/players and receive information.
+10. Send a request to ```localhost:{configured port}/players``` and receive information.
   
