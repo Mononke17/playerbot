@@ -1,14 +1,8 @@
 import fetch from "node-fetch";
 import * as cheerio from "cheerio";
 const fs = require("fs");
-
-export async function updateDB({
-  loadfile,
-  apikey,
-}: {
-  loadfile: string;
-  apikey: string;
-}) {
+const config = require("./../config.json");
+export async function updateDB(loadfile: string) {
   const playerNames: string[] = loadPlayerNames(loadfile);
   const playerurls: string[] = loadPlayerLinks(loadfile);
   const playerTeams: string[] = loadPlayerTeams(loadfile);
@@ -19,10 +13,7 @@ export async function updateDB({
     await geturlText(playerurls[i])
       .then(async function (playerurl) {
         console.log(
-          "DBUPDATE getRIOTIDS Progress: " +
-            (i + 1) +
-            " / " +
-            playerNames.length,
+          "DBUPDATE Progress: " + (i + 1) + " / " + playerNames.length,
         );
         playerPUUIDs.push(await getPUUIDs(getPlayerAccs(playerurl)));
       })
@@ -36,28 +27,29 @@ export async function updateDB({
     dbstring +=
       playerTeams[i] + "." + playerNames[i] + ":" + playerPUUIDs[i] + "\n";
   }
-  fs.writeFile("DB.txt", dbstring, (err: Error) => {
+  fs.writeFile("./../DB.txt", dbstring, (err: Error) => {
     if (err) {
       console.error(err);
     } else {
       console.log("DB updated!");
     }
   });
-  fs.writeFile("errors.txt", errors, (err: Error) => {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log("errors written, check for debug");
-    }
-  });
-  fs.writeFile("log.txt", log, (err: Error) => {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log("errors written, check for debug");
-    }
-  });
-
+  if (config.logging) {
+    fs.writeFile("./../logs/errors.txt", errors, (err: Error) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log("errors written, check for debug");
+      }
+    });
+    fs.writeFile("./../logs/log.txt", log, (err: Error) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log("errors written, check for debug");
+      }
+    });
+  }
   function loadPlayerNames(fileInputPath: string): string[] {
     try {
       const data = fs.readFileSync(fileInputPath, "utf8");
@@ -106,6 +98,15 @@ export async function updateDB({
           if (playerTeams[i] === "-") {
             playerTeams[i] = "";
           }
+          if (playerTeams[i] == "Vitality.Bee") {
+            playerTeams[i] = "Vitality Bee";
+          }
+          if (playerTeams[i] == "Gen.G") {
+            playerTeams[i] = "Gen G";
+          }
+          if (playerTeams[i].includes(".")) {
+            playerTeams[i] = "";
+          }
         }
         return playerTeams;
       } else {
@@ -146,7 +147,7 @@ export async function updateDB({
         "/" +
         playerRiotIDs[i].slice(playerRiotIDs[i].indexOf("#") + 1) +
         "?api_key=" +
-        apikey;
+        config.apikey;
       let response = await geturl(url);
       let jsonresponse = await response.json();
 
