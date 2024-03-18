@@ -34,6 +34,9 @@ export async function updateDB(loadfile: string) {
       if (errors == "") {
         console.log("DB updated without error!");
       } else {
+        console.log(
+          "DB updated with some error, check logs, if enabled for errors. INFO: Some amount of 404 errors can be safely ignored, that just means someone namechanged his account and lolpros.gg didnt catch up yet ",
+        );
       }
     }
   });
