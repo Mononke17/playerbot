@@ -31,22 +31,25 @@ export async function updateDB(loadfile: string) {
     if (err) {
       console.error(err);
     } else {
-      console.log("DB updated!");
+      if (errors == "") {
+        console.log("DB updated without error!");
+      } else {
+      }
     }
   });
   if (config.logging) {
-    fs.writeFile("./../logs/errors.txt", errors, (err: Error) => {
+    fs.writeFile("./../dblogs/errors.txt", errors, (err: Error) => {
       if (err) {
         console.error(err);
       } else {
-        console.log("errors written, check for debug");
+        console.log("errors written, check dblogs for debug");
       }
     });
-    fs.writeFile("./../logs/log.txt", log, (err: Error) => {
+    fs.writeFile("./../dblogs/log.txt", log, (err: Error) => {
       if (err) {
         console.error(err);
       } else {
-        console.log("errors written, check for debug");
+        console.log("logs written, check dblogs for debug");
       }
     });
   }
@@ -155,14 +158,10 @@ export async function updateDB(loadfile: string) {
         if (response.status != 200) {
           errors +=
             response.status + " " + playerRiotIDs[i] + "\n" + url + "\n";
-          console.log(playerRiotIDs[i]);
-          console.log(url);
-          console.log("riot api response code: " + response.status);
           puuids.push("");
           i++;
         } else {
           log += jsonresponse.puuid + "," + playerRiotIDs[i] + "\n";
-          console.log(jsonresponse.puuid);
           puuids.push(jsonresponse.puuid);
           i++;
         }

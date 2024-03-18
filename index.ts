@@ -6,16 +6,17 @@ const express = require("express");
 const app = express();
 
 export let DB = "";
-try {
-  const data = fs.readFileSync("DB.txt", "utf8");
-  DB = data;
-} catch (err) {
-  console.error(err);
-  console.log(
-    'considere to generate db first using "node index.js S(ync) /path/to/ladders.html".',
-  );
+if (!process.argv[2]) {
+  try {
+    const data = fs.readFileSync("DB.txt", "utf8");
+    DB = data;
+  } catch (err) {
+    console.error(err);
+    console.log(
+      'maybe generate db first using "node index.js S(ync) /path/to/ladders.html".',
+    );
+  }
 }
-
 export const playeruuids: string[] = observeduuids(config.proname);
 if (process.argv[2]) {
   if (process.argv[2][0] == "S") {
@@ -42,6 +43,8 @@ function observeduuids(proname: string): string[] {
   if (accs != null) {
     return accs[0].split(",");
   }
-  console.error("NO ACCOUNTS FOUND IN DB FOR GIVEN PLAYERNAME");
+  if (!process.argv[2]) {
+    console.error("NO ACCOUNTS FOUND IN DB FOR GIVEN PLAYERNAME");
+  }
   return [""];
 }
