@@ -1,6 +1,6 @@
 {
-  "apikey": "",
-  "proname": "",
+  "apikey": "RGAPI-dbb7cdf8-0249-4f77-9621-7d615ed744d2",
+  "proname": "Sertuss",
   "logging": true,
   "port": 3000,
   "teamAbbreviations": true

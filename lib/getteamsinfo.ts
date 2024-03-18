@@ -129,7 +129,7 @@ export async function getteamsinfo(): Promise<string> {
       returnstring += "Average Elo: " + eloToRank(blueelo) + " | Red Team: ";
     }
     if (names[i] != "") {
-      returnstring += champions[i] + " = " + teams[i] + " " + names[i] + ", ";
+      returnstring += teams[i] + " " + names[i] + "(" + champions[i] + "), ";
     }
   }
   returnstring += "Average Elo: " + eloToRank(redelo);
