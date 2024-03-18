@@ -1,4 +1,4 @@
-// returns elo as a a number, relative to Master 0 LP
+// returns elo relative to Master 0 LP as a a number,
 export function eloToRank(lp: number): string {
   if (lp >= 0) {
     return "Master+ " + lp + "LP";
