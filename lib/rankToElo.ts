@@ -1,4 +1,4 @@
-//returns elo from a Rank, that is relative to master 0 lp
+//returns elo, that is relative to master 0 lp, from a Rank.
 export function rankToElo(lp: number, tier: string, division: string): number {
   if (tier === "GRANDMASTER" || tier === "CHALLENGER" || tier === "MASTER") {
     return lp;
